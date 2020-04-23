@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"><title>Vue Todo Tutorial</title>
+  <script src="vue.js"></script>
+  <style>
+    .empty {
+      border-color: red;
+	}
+    .finished {
+      text-decoration: line-through;
+    }
+    .selected {
+      color: red;
+    }
+  </style>
+</head>
+<body>
+  <div id="todo-app">
+    <input type="button" value="全部标为完成" @click="markAllAsCompleted"/>
+    <input id="test" type="text" placeholder="添加 todo" v-model="newTodoTitle" v-bind:class="{empty: !this.length==0}" @keyup.enter="addTodo"/>
+
+  <!-- todo list -->
+  <ul>
+    <li v-for='todo in filteredTodos' :key='todo.id'>
+      <span :class="{finished: todo.finished}" @dblclick="editTodo(todo)">{{ todo.title }}</span>
+	  <input type="checkbox" onclick="return false;" v-bind:checked="todo.finished" />
+      <input type="button" value="标为完成" @click="markAsFinished(todo)" />
+      <input type="button" value="删除" @click="removeTodo(todo)">
+      <input type="text" value="编辑 todo..." 
+		v-model="todo.title" 
+		v-focus="true"
+		v-if="editedTodo !== null && editedTodo.id==todo.id" 
+		@keyup.esc="cancelEdit(todo)"
+		@keyup.enter="editDone(todo)" /> <!-- 当逻辑值editedTodo为真才渲染这个input -->
+    </li>
+  </ul>
+  <!-- end todo list -->
+  <div>
+    <span>剩余{{leftTodosCount}}项未完成 ---</span>
+    <span>筛选：
+      <input type="button" :class="{selected: intention == 'all'}" value="全部" @click="intention='all'"/>
+      <input type="button" :class="{selected: intention == 'ongoing'}"  value="进行中" @click="intention='ongoing'"/>
+      <input type="button" :class="{selected: intention == 'finished'}" value="已完成" @click="intention='finished'"/>
+      <input type="button" value="清除已完成" @click="clearFinished"/>
+      <input type="button" value="清除全部" @click="clearAll"/>
+    </span>
+  </div>
+</div>
+</body>
+
+<script>
+    let id = 0;
+    var app = new Vue({
+        el: '#todo-app',
+        data: function () {
+            return {
+				todos: [],
+				newTodoTitle: '',
+				editedTodo: null,
+				intention: 'all',
+			}
+        },
+		
+		directives: {
+			focus: {
+				inserted: function (el) {
+					el.focus()
+				}
+			},
+		},
+		
+		computed: {
+			leftTodos: function () {
+				return this.todos.filter(todo=>!todo.finished)
+			},
+			leftTodosCount: function () {
+				return this.leftTodos.length
+			},
+			filteredTodos: function () {
+				if (this.intention === 'ongoing' ) {
+					return this.todos.filter(todo=>!todo.finished)
+				} else if (this.intention === 'finished') {
+					return this.todos.filter(todo=>todo.finished)
+				} else {
+					return this.todos
+				}
+			},
+		},
+		
+		methods: {
+			send: function () {
+				if (this.count){
+					alert('发送成功')
+					this.value = ''
+				}else{
+					alert('请输入内容');
+					return
+				}
+			},
+			addTodo: function () {
+				if (this.newTodoTitle.length==0) return false
+				this.todos.push({id: id++, title: this.newTodoTitle, finished: false});
+				this.newTodoTitle = ''
+			},
+			markAsFinished: function (todo) {
+				todo.finished = true
+			},
+			editTodo: function (todo) {
+				this.editedTodo = {id: todo.id, title: todo.title, finished: todo.finished}
+			},
+			removeTodo: function (todo) {
+				this.todos.splice(this.todos.indexOf(todo),1)
+			},
+			editDone: function (todo) {
+				if (todo.title.length==0){
+					this.todos.splice(this.todos.indexOf(todo),1)
+				}else{
+					this.editedTodo = null;
+				}
+			},
+			cancelEdit: function (todo) {
+				todo.title = this.editedTodo.title;
+				this.editedTodo = null
+			},
+			markAllAsCompleted: function () {
+				this.todos.map(function (todo) {
+					if (!todo.finished){
+						todo.finished = true
+					}
+				})
+			},
+			clearFinished: function () {
+				this.todos = this.todos.filter(todo => !todo.finished)
+			},
+			clearAll: function () {
+				this.todos = []
+			},
+		}
+    })
+</script>
+</html>
