@@ -18,7 +18,7 @@
 <body>
   <div id="todo-app">
     <input type="button" value="全部标为完成" @click="markAllAsCompleted"/>
-    <input id="test" type="text" placeholder="添加 todo" v-model="newTodoTitle" v-bind:class="{empty: !this.length==0}" @keyup.enter="addTodo"/>
+    <input id="test" type="text" placeholder="添加 todo" v-model="newTodoTitle" v-bind:class="{empty: newTodoTitle.length==0}" @keyup.enter="addTodo"/>
 
   <!-- todo list -->
   <ul>
