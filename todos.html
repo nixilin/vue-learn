@@ -37,31 +37,56 @@
   </ul>
   <!-- end todo list -->
   <div>
-    <span>剩余{{leftTodosCount}}项未完成 ---</span>
-	<span>剩余{{leftTodosCount}}项未完成 ---</span>
-    <span>筛选：
-      <input type="button" :class="{selected: intention == 'all'}" value="全部" @click="intention='all'"/>
-      <input type="button" :class="{selected: intention == 'ongoing'}"  value="进行中" @click="intention='ongoing'"/>
-      <input type="button" :class="{selected: intention == 'finished'}" value="已完成" @click="intention='finished'"/>
-      <input type="button" v-if="todos.filter(todo => todo.finished).length > 0" value="清除已完成" @click="clearFinished"/>
-      <input type="button" v-if="todos.length > 0" value="清除全部" @click="clearAll"/>
-    </span>
+	<span v-if="!(leftTodosCount|intention!='all')">全部完成</span>
+	<span v-if="leftTodosCount|intention!='all'">
+		<span>剩余{{leftTodosCount}}项未完成</span>
+		<span>筛选：
+		<input type="button" :class="{selected: intention == 'all'}" value="全部" @click="intention='all'"/>
+		<input type="button" :class="{selected: intention == 'ongoing'}"  value="进行中" @click="intention='ongoing'"/>
+		<input type="button" :class="{selected: intention == 'finished'}" value="已完成" @click="intention='finished'"/>
+		<input type="button" v-if="todos.filter(todo => todo.finished).length > 0" value="清除已完成" @click="clearFinished"/>
+		<input type="button" v-if="todos.length > 0" value="清除全部" @click="clearAll"/>
+		</span>
+	</span>
   </div>
 </div>
 </body>
 
 <script>
-    let id = 0;
+	var STORAGE_KEY = 'vue2.x-todo-tutorial';
+	var todoStorage = {
+		fetch: function () {
+			var todos = JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]');
+			todos.forEach(function (todo,index) {
+				todo.id = index ;
+			})
+			todoStorage.uid = todos.length;
+			return todos
+		},
+		save: function (todos) {
+			localStorage.setItem(STORAGE_KEY,JSON.stringify(todos));
+		}
+	};
+    //let id = 0;
     var app = new Vue({
         el: '#todo-app',
         data: function () {
             return {
-				todos: [],
+				todos: todoStorage.fetch(),
 				newTodoTitle: '',
 				editedTodo: null,
 				intention: 'all',
 			}
         },
+		
+		watch: {
+			todos: {
+				handler: function (todos) {
+					todoStorage.save(todos)
+				}
+			},
+			deep: true
+		},
 		
 		directives: {
 			focus: {
@@ -101,7 +126,7 @@
 			},
 			addTodo: function () {
 				if (this.newTodoTitle.length==0) return false
-				this.todos.push({id: id++, title: this.newTodoTitle, finished: false});
+				this.todos.push({id: todoStorage.uid++, title: this.newTodoTitle, finished: false});
 				this.newTodoTitle = ''
 			},
 			markAsFinished: function (todo) {
