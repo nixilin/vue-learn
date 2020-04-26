@@ -24,7 +24,7 @@
   <ul>
     <li v-for='todo in filteredTodos' :key='todo.id'>
       <span :class="{finished: todo.finished}" @dblclick="editTodo(todo)">{{ todo.title }}</span>
-	  <input type="checkbox" onclick="return false;" v-bind:checked="todo.finished" />
+	  <input type="checkbox" onclick="return false;" :checked="todo.finished" />
       <input type="button" value="标为完成" @click="markAsFinished(todo)" />
       <input type="button" value="删除" @click="removeTodo(todo)">
       <input type="text" value="编辑 todo..." 
@@ -43,8 +43,8 @@
       <input type="button" :class="{selected: intention == 'all'}" value="全部" @click="intention='all'"/>
       <input type="button" :class="{selected: intention == 'ongoing'}"  value="进行中" @click="intention='ongoing'"/>
       <input type="button" :class="{selected: intention == 'finished'}" value="已完成" @click="intention='finished'"/>
-      <input type="button" v-if="todos.length>0" value="清除已完成" @click="clearFinished"/>
-      <input type="button" v-if="todos.length>0" value="清除全部" @click="clearAll"/>
+      <input type="button" v-if="todos.filter(todo => todo.finished).length > 0" value="清除已完成" @click="clearFinished"/>
+      <input type="button" v-if="todos.length > 0" value="清除全部" @click="clearAll"/>
     </span>
   </div>
 </div>
