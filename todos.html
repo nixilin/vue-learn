@@ -38,12 +38,13 @@
   <!-- end todo list -->
   <div>
     <span>剩余{{leftTodosCount}}项未完成 ---</span>
+	<span>剩余{{leftTodosCount}}项未完成 ---</span>
     <span>筛选：
       <input type="button" :class="{selected: intention == 'all'}" value="全部" @click="intention='all'"/>
       <input type="button" :class="{selected: intention == 'ongoing'}"  value="进行中" @click="intention='ongoing'"/>
       <input type="button" :class="{selected: intention == 'finished'}" value="已完成" @click="intention='finished'"/>
-      <input type="button" value="清除已完成" @click="clearFinished"/>
-      <input type="button" value="清除全部" @click="clearAll"/>
+      <input type="button" v-if="todos.length>0" value="清除已完成" @click="clearFinished"/>
+      <input type="button" v-if="todos.length>0" value="清除全部" @click="clearAll"/>
     </span>
   </div>
 </div>
