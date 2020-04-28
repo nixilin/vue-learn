@@ -25,7 +25,7 @@
     <li v-for='todo in filteredTodos' :key='todo.id'>
       <span :class="{finished: todo.finished}" @dblclick="editTodo(todo)">{{ todo.title }}</span>
 	  <input type="checkbox" onclick="return false;" :checked="todo.finished" />
-      <input type="button" value="标为完成" @click="markAsFinished(todo)" />
+      <input type="button" v-if="!todo.finished" value="标为完成" @click="markAsFinished(todo)" />
       <input type="button" value="删除" @click="removeTodo(todo)">
       <input type="text" value="编辑 todo..." 
 		v-model="todo.title" 
