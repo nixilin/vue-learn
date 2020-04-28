@@ -11,15 +11,15 @@
       text-decoration: line-through;
     }
     .selected {
-      color: red;
+      color: royalblue;
     }
   </style>
 </head>
 <body>
   <div id="todo-app">
     <input type="button" value="全部标为完成" @click="markAllAsCompleted"/>
-    <input id="test" type="text" placeholder="添加 todo" v-model="newTodoTitle" v-bind:class="{empty: newTodoTitle.length==0}" @keyup.enter="addTodo"/>
-
+    <input id="test" type="text" placeholder="添加 todo" v-model="newTodoTitle" v-bind:class="{empty: emptyChecked}" @keyup.enter="addTodo"/>
+	<span v-if="emptyChecked">请输入内容</span>
   <!-- todo list -->
   <ul>
     <li v-for='todo in filteredTodos' :key='todo.id'>
@@ -65,6 +65,9 @@
 		},
 		save: function (todos) {
 			localStorage.setItem(STORAGE_KEY,JSON.stringify(todos));
+		},
+		clearAll: function () {
+			localStorage.clear();
 		}
 	};
     //let id = 0;
@@ -76,6 +79,7 @@
 				newTodoTitle: '',
 				editedTodo: null,
 				intention: 'all',
+				checkEmpty: false,
 			}
         },
 		
@@ -97,19 +101,22 @@
 		},
 		
 		computed: {
+			emptyChecked: function () {
+				return this.newTodoTitle.length == 0 && this.checkEmpty;
+			},
 			leftTodos: function () {
-				return this.todos.filter(todo=>!todo.finished)
+				return this.todos.filter(todo=>!todo.finished);
 			},
 			leftTodosCount: function () {
-				return this.leftTodos.length
+				return this.leftTodos.length;
 			},
 			filteredTodos: function () {
 				if (this.intention === 'ongoing' ) {
-					return this.todos.filter(todo=>!todo.finished)
+					return this.todos.filter(todo=>!todo.finished);
 				} else if (this.intention === 'finished') {
-					return this.todos.filter(todo=>todo.finished)
+					return this.todos.filter(todo=>todo.finished);
 				} else {
-					return this.todos
+					return this.todos;
 				}
 			},
 		},
@@ -117,30 +124,34 @@
 		methods: {
 			send: function () {
 				if (this.count){
-					alert('发送成功')
-					this.value = ''
+					alert('发送成功');
+					this.value = '';
 				}else{
 					alert('请输入内容');
 					return
 				}
 			},
 			addTodo: function () {
-				if (this.newTodoTitle.length==0) return false
+				if (this.newTodoTitle.length==0) {
+					this.checkEmpty = true;
+					return
+				}
 				this.todos.push({id: todoStorage.uid++, title: this.newTodoTitle, finished: false});
-				this.newTodoTitle = ''
+				this.newTodoTitle = '';
+				this.checkEmpty = false;
 			},
 			markAsFinished: function (todo) {
-				todo.finished = true
+				todo.finished = true;
 			},
 			editTodo: function (todo) {
-				this.editedTodo = {id: todo.id, title: todo.title, finished: todo.finished}
+				this.editedTodo = {id: todo.id, title: todo.title, finished: todo.finished};
 			},
 			removeTodo: function (todo) {
-				this.todos.splice(this.todos.indexOf(todo),1)
+				this.todos.splice(this.todos.indexOf(todo),1);
 			},
 			editDone: function (todo) {
 				if (todo.title.length==0){
-					this.todos.splice(this.todos.indexOf(todo),1)
+					this.todos.splice(this.todos.indexOf(todo),1);
 				}else{
 					this.editedTodo = null;
 				}
@@ -152,15 +163,16 @@
 			markAllAsCompleted: function () {
 				this.todos.map(function (todo) {
 					if (!todo.finished){
-						todo.finished = true
+						todo.finished = true;
 					}
 				})
 			},
 			clearFinished: function () {
-				this.todos = this.todos.filter(todo => !todo.finished)
+				this.todos = this.todos.filter(todo => !todo.finished);
 			},
 			clearAll: function () {
-				this.todos = []
+				this.todos = [];
+				todoStorage.clearAll();
 			},
 		}
     })
