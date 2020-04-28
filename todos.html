@@ -25,7 +25,8 @@
     <li v-for='todo in filteredTodos' :key='todo.id'>
       <span :class="{finished: todo.finished}" @dblclick="editTodo(todo)">{{ todo.title }}</span>
 	  <input type="checkbox" onclick="return false;" :checked="todo.finished" />
-      <input type="button" v-if="!todo.finished" value="标为完成" @click="markAsFinished(todo)" />
+      <input v-if="!todo.finished" type="button" value="标为完成" @click="markAsFinished(todo)" />
+	  <input v-else type="button" value="标为未完成" @click="markAsUnFinished(todo)"/>
       <input type="button" value="删除" @click="removeTodo(todo)">
       <input type="text" value="编辑 todo..." 
 		v-model="todo.title" 
@@ -143,11 +144,16 @@
 			markAsFinished: function (todo) {
 				todo.finished = true;
 			},
+			markAsUnFinished: function (todo) {
+				todo.finished = false;
+			},
 			editTodo: function (todo) {
 				this.editedTodo = {id: todo.id, title: todo.title, finished: todo.finished};
 			},
 			removeTodo: function (todo) {
-				this.todos.splice(this.todos.indexOf(todo),1);
+				if (confirm("确认删除？")) {
+					this.todos.splice(this.todos.indexOf(todo),1);
+				}
 			},
 			editDone: function (todo) {
 				if (todo.title.length==0){
